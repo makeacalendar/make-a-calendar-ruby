@@ -25,4 +25,5 @@ jobs:
           ruby-version: "3.4"
           bundler-cache: true
       - run: ruby -Ilib spec/all_spec.rb
+      - run: git reset --hard HEAD
       - uses: rubygems/release-gem@v1
