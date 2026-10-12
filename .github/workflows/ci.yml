@@ -32,5 +32,5 @@ jobs:
       - run: ruby -Ilib spec/all_spec.rb
       - run: find lib exe spec examples -name '*.rb' -print0 | xargs -0 -n1 ruby -c
       - run: gem build make_a_calendar_toolkit.gemspec
-      - run: ruby -rrubygems/package -e 'files = Gem::Package.new("make_a_calendar_toolkit-0.1.0.gem").spec.files; abort "required package files are missing" unless files.include?("README.md") && files.include?("lib/make_a_calendar.rb")'
+      - run: ruby -rrubygems/package -e 'spec = Gem::Specification.load("make_a_calendar_toolkit.gemspec"); files = Gem::Package.new("make_a_calendar_toolkit-#{spec.version}.gem").spec.files; abort "required package files are missing" unless files.include?("README.md") && files.include?("lib/make_a_calendar.rb")'
       - run: ruby -Ilib exe/make-calendar --help
