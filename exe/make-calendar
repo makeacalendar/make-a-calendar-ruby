@@ -1,0 +1,156 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "optparse"
+require "json"
+begin
+  require "make_a_calendar"
+rescue LoadError
+  require_relative "../lib/make_a_calendar"
+end
+
+class MakeCalendarCLI
+  def run(argv)
+    command = argv.shift
+    return help if command.nil? || %w[-h --help help].include?(command)
+    options = { format: "json" }
+    options[:converter] = argv.shift if command == "convert"
+    parser = OptionParser.new do |opts|
+      opts.banner = "Usage: make-calendar COMMAND [options]"
+      opts.on("--year YEAR", Integer) { |value| options[:year] = value }
+      opts.on("--month MONTH", Integer) { |value| options[:month] = value }
+      opts.on("--week-start DAY") { |value| options[:week_start] = value.to_sym }
+      opts.on("--format FORMAT", %w[json csv html svg ics]) { |value| options[:format] = value }
+      opts.on("--from DATE") { |value| options[:from] = value }
+      opts.on("--to DATE") { |value| options[:to] = value }
+      opts.on("--date DATE") { |value| options[:date] = value }
+      opts.on("--days COUNT", Integer) { |value| options[:days] = value }
+      opts.on("--country COUNTRY") { |value| options[:country] = value }
+      opts.on("--observed") { options[:observed] = true }
+      opts.on("--pattern PATTERN") { |value| options[:pattern] = value }
+      opts.on("--start DATE") { |value| options[:start] = value }
+      opts.on("--output PATH") { |value| options[:output] = value }
+      opts.on("--input PATH") { |value| options[:input] = value }
+      opts.on("--force") { options[:force] = true }
+      opts.on("--serial VALUE") { |value| options[:serial] = value }
+      opts.on("--system SYSTEM") { |value| options[:system] = value }
+    end
+    parser.parse!(argv)
+    result = execute(command, options)
+    write_result(result, options)
+    0
+  rescue OptionParser::ParseError, ArgumentError, MakeACalendar::Error, KeyError => error
+    warn "make-calendar: #{error.message}"
+    2
+  end
+
+  private
+
+  def execute(command, options)
+    case command
+    when "month"
+      require_options(options, :year, :month)
+      calendar = MakeACalendar.month(year: options[:year], month: options[:month], week_start: options.fetch(:week_start, :sunday))
+      render(calendar, options)
+    when "year"
+      require_options(options, :year)
+      calendar = MakeACalendar.year(year: options[:year], week_start: options.fetch(:week_start, :sunday))
+      render(calendar, options)
+    when "business-days"
+      require_options(options, :from, :to)
+      count = MakeACalendar.business_days_between(options[:from], options[:to], holidays: options[:observed] ? MakeACalendar::Holidays.observed_dates(DateMath.date(options[:from]).year, DateMath.date(options[:to]).year) : [])
+      "#{count}\n"
+    when "add-business-days"
+      require_options(options, :date, :days)
+      MakeACalendar.add_business_days(options[:date], options[:days]).iso8601 + "\n"
+    when "holidays"
+      require_options(options, :year)
+      raise ArgumentError, "only --country us is supported" unless options.fetch(:country, "us").downcase == "us"
+      holidays = MakeACalendar.federal_holidays(options[:year])
+      holidays = holidays.map { |holiday| { name: holiday.name, date: (options[:observed] ? holiday.observed_date : holiday.date).iso8601 } }
+      JSON.pretty_generate(holidays) + "\n"
+    when "fiscal"
+      require_options(options, :year)
+      fiscal = MakeACalendar.fiscal_calendar(year: options[:year], pattern: options.fetch(:pattern, "445"))
+      JSON.pretty_generate(fiscal.to_h) + "\n"
+    when "shifts"
+      require_options(options, :start, :to, :pattern)
+      pattern = options[:pattern].split("-").map(&:to_i)
+      JSON.pretty_generate(MakeACalendar::Scheduling.shift_dates(start_date: options[:start], end_date: options[:to], pattern: pattern).map { |item| { date: item[:date].iso8601, on_duty: item[:on_duty], cycle_day: item[:cycle_day] } }) + "\n"
+    when "convert"
+      convert(options)
+    when "export-ics"
+      require_options(options, :input)
+      events = JSON.parse(File.read(options[:input]), symbolize_names: true)
+      MakeACalendar.to_ics(events)
+    else
+      raise ArgumentError, "unknown command #{command.inspect}; run make-calendar --help"
+    end
+  end
+
+  def render(calendar, options)
+    case options[:format]
+    when "json" then calendar.to_json + "\n"
+    when "csv" then calendar.respond_to?(:to_csv) ? calendar.to_csv : raise(ArgumentError, "CSV is supported for month calendars")
+    when "html" then calendar.to_html + "\n"
+    when "svg" then calendar.to_svg + "\n"
+    else raise ArgumentError, "format must be json, csv, html, or svg for calendars"
+    end
+  end
+
+  def convert(options)
+    case options.fetch(:converter) { raise ArgumentError, "use convert excel --serial VALUE [--system 1900|1904]" }
+    when "excel"
+      require_options(options, :serial)
+      MakeACalendar::Converters.excel(options[:serial], system: options.fetch(:system, "1900")).to_s + "\n"
+    when "ordinal"
+      require_options(options, :serial)
+      MakeACalendar::Converters.ordinal(options[:serial]).iso8601 + "\n"
+    when "unix"
+      require_options(options, :serial)
+      MakeACalendar::Converters.unix(options[:serial], unit: options.fetch(:system, "seconds").to_sym).iso8601 + "\n"
+    else
+      raise ArgumentError, "converter must be excel, ordinal, or unix"
+    end
+  end
+
+  def require_options(options, *keys)
+    missing = keys.reject { |key| options.key?(key) }
+    raise ArgumentError, "missing required option(s): #{missing.map { |key| "--#{key.to_s.tr('_', '-')}" }.join(', ')}" unless missing.empty?
+  end
+
+  def write_result(result, options)
+    if options[:output]
+      path = File.expand_path(options[:output])
+      raise ArgumentError, "refusing to overwrite #{path}; pass --force to replace it" if File.exist?(path) && !options[:force]
+      File.write(path, result)
+    else
+      print result
+    end
+  end
+
+  def help
+    puts <<~HELP
+      Usage: make-calendar COMMAND [options]
+
+      Commands:
+        month --year YEAR --month MONTH [--week-start sunday|monday] [--format json|csv|html|svg]
+        year --year YEAR [--format json|html|svg]
+        holidays --year YEAR [--country us] [--observed]
+        business-days --from DATE --to DATE [--observed]
+        add-business-days --date DATE --days N
+        fiscal --year YEAR [--pattern 445|454|544]
+        shifts --start DATE --to DATE --pattern 2-2-3
+        convert excel --serial VALUE [--system 1900|1904]
+        convert ordinal --serial YYYY-DDD
+        convert unix --serial VALUE [--system seconds|milliseconds|microseconds|nanoseconds]
+        export-ics --input events.json [--output FILE]
+
+      Output goes to stdout by default. --output refuses existing files unless --force is set.
+      Business-day ranges include both endpoints; adding days does not count the start date.
+    HELP
+    0
+  end
+end
+
+exit MakeCalendarCLI.new.run(ARGV)
