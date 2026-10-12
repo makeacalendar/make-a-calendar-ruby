@@ -164,6 +164,9 @@ class MakeACalendarSpec < Minitest::Test
     assert_includes year.to_svg, "Twelve month calendar"
     assert_equal 12, year.to_json.scan(/\"month\"/).length
     assert_includes year.to_html, "grid-template-columns:repeat(3,1fr)"
+    custom_html = year.to_html(title: "<FY2027>")
+    assert_includes custom_html, "<title>&lt;FY2027&gt;</title>"
+    assert_includes custom_html, "<h1>&lt;FY2027&gt;</h1>"
   end
 
   def test_ics_format_escaping_and_crlf
