@@ -25,5 +25,4 @@ jobs:
           ruby-version: "3.4"
           bundler-cache: true
       - run: ruby -Ilib spec/all_spec.rb
-      - run: gem build make_a_calendar_toolkit.gemspec
       - uses: rubygems/release-gem@v1
