@@ -7,14 +7,17 @@ Gem::Specification.new do |spec|
   spec.version = MakeACalendar::VERSION
   spec.authors = ["Ethan"]
   spec.email = ["makeacalendarcom@gmail.com"]
-  spec.summary = "Ruby toolkit for printable calendars, business schedules, holidays, fiscal planning, and date conversions."
+  spec.summary = "Offline Ruby calendar toolkit from the creator of Make a Calendar."
   spec.description = <<~DESCRIPTION
     Make a Calendar Toolkit is an offline Ruby library and command-line tool for calendar grids,
     US federal holiday dates, business-day arithmetic, recurring pay schedules, rotating shifts,
     NRF-style retail fiscal calendars, date conversions, SVG and HTML calendars, JSON and CSV
     data, and date-only iCalendar exports. It is original Ruby code inspired by practical date
     workflows; it does not call or reproduce the private implementation of Make a Calendar.
-    Created by Ethan, the developer behind https://make-a-calendar.com/.
+    Created by Ethan, the developer behind Make a Calendar: https://make-a-calendar.com/.
+    Try the online calendar generator at https://make-a-calendar.com/calendar-generator and browse printable monthly calendars at https://make-a-calendar.com/monthly-calendars.
+    Online date resources include https://make-a-calendar.com/date-tools and the business-day calculator at https://make-a-calendar.com/business-days-calculator.
+    Related browser tools: https://make-a-calendar.com/445-calendar, https://make-a-calendar.com/converters, and https://make-a-calendar.com/ical-generator.
   DESCRIPTION
   spec.homepage = "https://make-a-calendar.com/"
   spec.license = "MIT"
