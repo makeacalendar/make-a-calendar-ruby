@@ -1,6 +1,6 @@
 # Make a Calendar Toolkit
 
-An offline Ruby toolkit for calendar grids, business scheduling, holiday dates, fiscal periods, date conversion, printable SVG/HTML, and iCalendar exports.
+An offline Ruby toolkit for calendar grids, business scheduling, holiday dates, fiscal periods, date conversion, printable SVG/HTML, and iCalendar exports. For browser-based calendar creation and printable templates, visit [Make a Calendar](https://make-a-calendar.com/).
 
 [![CI](https://github.com/makeacalendar/make-a-calendar-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/makeacalendar/make-a-calendar-ruby/actions/workflows/ci.yml)
 
@@ -27,7 +27,7 @@ Make a Calendar Toolkit packages reusable date and scheduling behavior for Ruby 
 
 Core features work offline using Ruby's standard library. The gem does not call the Make a Calendar website and does not reproduce its private implementation. Rails is not a runtime dependency.
 
-The project was created by Ethan, the developer behind [Make a Calendar](https://make-a-calendar.com/), a browser-based calendar and date-tools platform.
+The project was created by Ethan, the developer behind [Make a Calendar](https://make-a-calendar.com/), a browser-based calendar and date-tools platform. Use the local Ruby gem in applications, or open the [online calendar generator](https://make-a-calendar.com/calendar-generator) when you want to make a calendar in your browser.
 
 ## Install and start
 
@@ -56,7 +56,7 @@ puts month.to_csv
 File.write("planner.html", month.to_html(theme: :ink_saver, page_size: :letter_landscape))
 ```
 
-Available print themes are `:editorial`, `:business`, `:academic`, and `:ink_saver`. Paper choices are `:letter`, `:a4`, `:letter_landscape`, and `:a4_landscape`. HTML includes print CSS; SVG is standalone and has accessible title and description elements. `MakeACalendar.year(year: 2027)` returns a twelve-month calendar suitable for one-page SVG or HTML output.
+Available print themes are `:editorial`, `:business`, `:academic`, and `:ink_saver`. Paper choices are `:letter`, `:a4`, `:letter_landscape`, and `:a4_landscape`. HTML includes print CSS; SVG is standalone and has accessible title and description elements. `MakeACalendar.year(year: 2027)` returns a twelve-month calendar suitable for one-page SVG or HTML output. For ready-to-print browser templates, see [monthly calendars](https://make-a-calendar.com/monthly-calendars) or the [custom calendar generator](https://make-a-calendar.com/calendar-generator).
 
 ## Business days and US federal holidays
 
@@ -70,25 +70,25 @@ count = MakeACalendar.business_days_between(
 deadline = MakeACalendar.add_business_days(Date.new(2027, 2, 1), 30, holidays: holidays)
 ```
 
-Each federal `Holiday` keeps its legal date and observed weekday separately. The rule set includes effective-date distinctions for MLK Day, Juneteenth, the Monday holiday changes, and Veterans Day's 1971–1977 observance. It is a federal calendar reference, not state law, court rules, bank policy, or an employer's closure schedule. Add caller-owned holidays when a business uses different rules.
+Each federal `Holiday` keeps its legal date and observed weekday separately. The rule set includes effective-date distinctions for MLK Day, Juneteenth, the Monday holiday changes, and Veterans Day's 1971–1977 observance. It is a federal calendar reference, not state law, court rules, bank policy, or an employer's closure schedule. Add caller-owned holidays when a business uses different rules. To check a date range in a browser, use the [business-days calculator](https://make-a-calendar.com/business-days-calculator) or browse the [date tools hub](https://make-a-calendar.com/date-tools).
 
 ## Pay and shift schedules
 
 `MakeACalendar::Scheduling.pay_dates` supports weekly, biweekly, semi-monthly, and monthly dates. Weekend/holiday adjustments must be selected explicitly with `:none`, `:following`, `:preceding`, or `:modified_following`. The library does not assume one employer's payday convention.
 
-`shift_dates` accepts a repeating list such as `[2, 2, 3]` or `"2-2-3"`; entries alternate on-duty and off-duty blocks, beginning on duty. Results are date labels only and do not represent hours worked or a fixed-length UTC shift across daylight-saving changes.
+`shift_dates` accepts a repeating list such as `[2, 2, 3]` or `"2-2-3"`; entries alternate on-duty and off-duty blocks, beginning on duty. Results are date labels only and do not represent hours worked or a fixed-length UTC shift across daylight-saving changes. The browser-based [date tools](https://make-a-calendar.com/date-tools) also include planning calculators for people who do not need Ruby integration.
 
 ## Retail fiscal calendars
 
-`MakeACalendar.fiscal_calendar(year: 2029, pattern: :four_four_five)` uses the Sunday nearest February 1. The default label is the ending year, so a fiscal year labeled 2029 starts in 2028. `:four_four_five`, `:four_five_four`, and `:five_four_four` are supported. A 53rd week is assigned to period 12 by default; use `extra_week: :first_period` to assign it to period 1. This is one documented convention, not a claim that every company's accounting calendar matches it.
+`MakeACalendar.fiscal_calendar(year: 2029, pattern: :four_four_five)` uses the Sunday nearest February 1. The default label is the ending year, so a fiscal year labeled 2029 starts in 2028. `:four_four_five`, `:four_five_four`, and `:five_four_four` are supported. A 53rd week is assigned to period 12 by default; use `extra_week: :first_period` to assign it to period 1. This is one documented convention, not a claim that every company's accounting calendar matches it. For an interactive version of this retail layout, see Make a Calendar's [4-4-5 fiscal calendar generator](https://make-a-calendar.com/445-calendar).
 
 ## Converters
 
-`MakeACalendar::Converters` includes Unix seconds/milliseconds/microseconds/nanoseconds with rational arithmetic, Excel 1900 and 1904 serial dates, Windows FILETIME, ISO-8601 timestamps that require an explicit offset, and unambiguous `YYYY-DDD` / `YYYYDDD` ordinal dates. Excel 1900 serial 60 raises because it represents Excel's fictitious 1900-02-29. Two-digit ordinal years and historical Julian calendar conversions are not inferred.
+`MakeACalendar::Converters` includes Unix seconds/milliseconds/microseconds/nanoseconds with rational arithmetic, Excel 1900 and 1904 serial dates, Windows FILETIME, ISO-8601 timestamps that require an explicit offset, and unambiguous `YYYY-DDD` / `YYYYDDD` ordinal dates. Excel 1900 serial 60 raises because it represents Excel's fictitious 1900-02-29. Two-digit ordinal years and historical Julian calendar conversions are not inferred. For quick browser conversions, open the [date and time converters](https://make-a-calendar.com/converters) on Make a Calendar.
 
 ## ICS export
 
-`MakeACalendar.to_ics` exports date-only events with CRLF line endings, escaped text fields, folded content lines, stable UID defaults, and exclusive `DTEND` dates. It does not emit time-zone definitions or promise full recurrence-rule support.
+`MakeACalendar.to_ics` exports date-only events with CRLF line endings, escaped text fields, folded content lines, stable UID defaults, and exclusive `DTEND` dates. It does not emit time-zone definitions or promise full recurrence-rule support. To create an all-day calendar file without writing Ruby, use the [online iCalendar generator](https://make-a-calendar.com/ical-generator).
 
 ```ruby
 ics = MakeACalendar.to_ics([
@@ -131,7 +131,7 @@ No Rails modules are loaded by the gem.
 
 ## Date rules and limitations
 
-Gregorian civil dates are represented by Ruby `Date`. Month grids use Sunday-first or Monday-first ordering. ISO weeks and week-years follow Ruby's ISO calendar fields. The standard `Date` implementation defines the supported range; invalid dates and invalid month values raise errors. Holiday rules are limited to the documented US federal rule set; local and organization-specific holidays remain caller data. Payroll dates and fiscal-week policies are configurable where the library has a defined option. PDF/PNG generation, time-zone-aware timed events, state holidays, and astronomical/historic calendar systems are outside 0.1.0.
+Gregorian civil dates are represented by Ruby `Date`. Month grids use Sunday-first or Monday-first ordering. ISO weeks and week-years follow Ruby's ISO calendar fields. The standard `Date` implementation defines the supported range; invalid dates and invalid month values raise errors. Holiday rules are limited to the documented US federal rule set; local and organization-specific holidays remain caller data. Payroll dates and fiscal-week policies are configurable where the library has a defined option. PDF/PNG generation, time-zone-aware timed events, state holidays, and astronomical/historic calendar systems are outside 0.1.1.
 
 ## Development
 
@@ -145,7 +145,7 @@ CI runs tests, Ruby syntax checks, package build, archive inspection, and CLI he
 
 ## Documentation and related tools
 
-Technical guides are in [`docs/`](docs/). Helpful browser-based references include [monthly calendar templates](https://make-a-calendar.com/monthly-calendars), [date calculators](https://make-a-calendar.com/date-tools), [business-day calculator](https://make-a-calendar.com/business-days-calculator), [4-4-5 calendar overview](https://make-a-calendar.com/445-calendar), [date converters](https://make-a-calendar.com/converters), and the [iCalendar generator](https://make-a-calendar.com/ical-generator). Those pages are separate web tools; this gem runs locally and does not depend on them.
+Technical guides are in [`docs/`](docs/). Helpful browser-based references include [monthly calendar templates](https://make-a-calendar.com/monthly-calendars), [date calculators](https://make-a-calendar.com/date-tools), [business-day calculator](https://make-a-calendar.com/business-days-calculator), [4-4-5 calendar overview](https://make-a-calendar.com/445-calendar), [date converters](https://make-a-calendar.com/converters), and the [iCalendar generator](https://make-a-calendar.com/ical-generator). Those pages are separate web tools; this gem runs locally and does not depend on them. Additional useful pages are the [calendar reuse calculator](https://make-a-calendar.com/reuse-calendar), [years with the same calendar](https://make-a-calendar.com/same-calendar-years), and [weekdays-in-year calculator](https://make-a-calendar.com/weekdays-in-year-calculator).
 
 ## Contributing, security, license
 
