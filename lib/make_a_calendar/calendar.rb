@@ -145,7 +145,7 @@ module MakeACalendar
         table = html[/<table>.*?<\/table>/m]
         %(<section><h2>#{Date::MONTHNAMES[calendar.month]}</h2>#{table}</section>)
       end
-      %(<html lang="en"><meta charset="utf-8"><title>#{year} calendar</title><style>@page{size:#{page_size == :a4 ? "A4" : "Letter"};margin:8mm}body{font-family:Arial,sans-serif}h1{text-align:center}.year{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}section{break-inside:avoid}h2{font-size:12px;margin:4px 0}table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:8px}td,th{border:1px solid #aaa;padding:2px;text-align:center}@media print{.year{gap:6px}}</style><h1>#{year}</h1><div class="year">#{cards.join}</div></html>)
+      %(<html lang="en"><meta charset="utf-8"><title>#{CGI.escapeHTML(title)}</title><style>@page{size:#{page_size == :a4 ? "A4" : "Letter"};margin:8mm}body{font-family:Arial,sans-serif}h1{text-align:center}.year{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}section{break-inside:avoid}h2{font-size:12px;margin:4px 0}table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:8px}td,th{border:1px solid #aaa;padding:2px;text-align:center}@media print{.year{gap:6px}}</style><h1>#{CGI.escapeHTML(title)}</h1><div class="year">#{cards.join}</div></html>)
     end
 
     def to_svg(title: "#{year} Calendar", theme: :editorial)
