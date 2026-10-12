@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+      - run: gem install rubocop -v 1.62.1 --no-document
+      - run: rubocop lib exe
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.7", "3.2", "3.4"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - run: ruby -Ilib spec/all_spec.rb
+      - run: find lib exe spec examples -name '*.rb' -print0 | xargs -0 -n1 ruby -c
+      - run: gem build make_a_calendar_toolkit.gemspec
+      - run: gem contents ./make_a_calendar_toolkit-0.1.0.gem
+      - run: ruby -Ilib exe/make-calendar --help
