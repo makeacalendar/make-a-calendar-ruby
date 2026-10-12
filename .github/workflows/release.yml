@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -21,7 +22,7 @@ jobs:
           persist-credentials: false
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ruby
+          ruby-version: "3.4"
           bundler-cache: true
       - run: ruby -Ilib spec/all_spec.rb
       - run: gem build make_a_calendar_toolkit.gemspec
