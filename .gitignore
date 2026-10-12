@@ -1,0 +1,5 @@
+/.bundle/
+/vendor/
+*.gem
+coverage/
+.DS_Store

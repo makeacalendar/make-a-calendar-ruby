@@ -1,0 +1,21 @@
+PATH
+  remote: .
+  specs:
+    make_a_calendar_toolkit (0.1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    minitest (5.11.3)
+    rake (12.3.3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  make_a_calendar_toolkit!
+  minitest (~> 5.0)
+  rake (~> 12.0)
+
+BUNDLED WITH
+   1.17.2
